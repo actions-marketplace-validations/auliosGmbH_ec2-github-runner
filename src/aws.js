@@ -29,7 +29,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
         `Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-${runnerVersion}.zip", "$PWD")`,
         `./config.cmd --url https://github.com/${config.githubContext.owner}/${
           config.githubContext.repo
-        } --token ${githubRegistrationToken} --labels --name ${label} --name ${makeid(8)} --unattended`,
+        } --token ${githubRegistrationToken} --labels --name ${label} --name ${makeid(6)} --unattended`,
         './run.cmd',
         '</powershell>',
         '<persist>false</persist>',
