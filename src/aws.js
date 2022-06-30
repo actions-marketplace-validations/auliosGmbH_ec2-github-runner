@@ -19,6 +19,9 @@ function buildUserDataScript(githubRegistrationToken, label) {
   core.info(`Building data script for ${config.input.ec2Os}`);
 
   if (config.input.ec2Os === 'windows') {
+    const serverName = makeid(8);
+    core.info(`GitHub self-hosted runner ${serverName} is called`);
+
     if (config.input.runnerHomeDir) {
       // If runner home directory is specified, we expect the actions-runner software (and dependencies)
       // to be pre-installed in the AMI, so we simply cd into that directory and then start the runner
@@ -27,9 +30,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
         'mkdir actions-runner; cd actions-runner',
         `Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-win-x64-${runnerVersion}.zip -OutFile actions-runner-win-x64-${runnerVersion}.zip`,
         `Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-${runnerVersion}.zip", "$PWD")`,
-        `./config.cmd --url https://github.com/${config.githubContext.owner}/${
-          config.githubContext.repo
-        } --token ${githubRegistrationToken} --labels --name ${label} --name ${makeid(6)} --unattended`,
+        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels --name ${label} --name ${serverName} --unattended`,
         './run.cmd',
         '</powershell>',
         '<persist>false</persist>',
@@ -38,9 +39,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       return [
         '<powershell>',
         `cd "${config.input.runnerHomeDir}"`,
-        `./config.cmd --url https://github.com/${config.githubContext.owner}/${
-          config.githubContext.repo
-        } --token ${githubRegistrationToken} --labels ${label} --name ${makeid(8)} --unattended`,
+        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${label} --name ${serverName} --unattended`,
         './run.cmd',
         '</powershell>',
         '<persist>false</persist>',
