@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const core = require('@actions/core');
 const config = require('./config');
 
-const runnerVersion = '2.291.1';
+const runnerVersion = '2.294.0';
 
 function makeid(length) {
   var result = '';
@@ -20,7 +20,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
 
   if (config.input.ec2Os === 'windows') {
     const serverName = makeid(8);
-    core.info(`GitHub self-hosted runner ${serverName} is called`);
+    core.info(`GitHub self-hosted runner is called: ${serverName} `);
 
     if (config.input.runnerHomeDir) {
       // If runner home directory is specified, we expect the actions-runner software (and dependencies)
@@ -30,7 +30,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
         'mkdir actions-runner; cd actions-runner',
         `Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-win-x64-${runnerVersion}.zip -OutFile actions-runner-win-x64-${runnerVersion}.zip`,
         `Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-${runnerVersion}.zip", "$PWD")`,
-        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels --name ${label} --name ${serverName} --unattended`,
+        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --name ${serverName} --unattended`,
         './run.cmd',
         '</powershell>',
         '<persist>false</persist>',
@@ -39,7 +39,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       return [
         '<powershell>',
         `cd "${config.input.runnerHomeDir}"`,
-        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${label} --name ${serverName} --unattended`,
+        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --name ${serverName} --unattended`,
         './run.cmd',
         '</powershell>',
         '<persist>false</persist>',
@@ -99,6 +99,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
     const result = await ec2.runInstances(params).promise();
     const ec2InstanceId = result.Instances[0].InstanceId;
     core.info(`AWS EC2 instance ${ec2InstanceId} is started`);
+    core.info(result.toString());
     return ec2InstanceId;
   } catch (error) {
     core.error('AWS EC2 instance starting error');
