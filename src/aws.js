@@ -30,7 +30,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
         'mkdir actions-runner; cd actions-runner',
         `Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-win-x64-${runnerVersion}.zip -OutFile actions-runner-win-x64-${runnerVersion}.zip`,
         `Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD/actions-runner-win-x64-${runnerVersion}.zip", "$PWD")`,
-        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --name ${serverName} --unattended`,
+        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${label} --name ${serverName} --unattended`,
         './run.cmd',
         '</powershell>',
         '<persist>false</persist>',
@@ -39,7 +39,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       return [
         '<powershell>',
         `cd "${config.input.runnerHomeDir}"`,
-        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --name ${serverName} --unattended`,
+        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --token ${githubRegistrationToken} --labels ${label} --name ${serverName}  --unattended`,
         './run.cmd',
         '</powershell>',
         '<persist>false</persist>',
